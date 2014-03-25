@@ -18,6 +18,7 @@ gulp.task('lint', function () {
 });
 
 gulp.task('test', ['lint'], function (done) {
+  require('test-setup');
   gulp.src(files.src)
     .pipe(plugins.istanbul())
     .on('end', function () {
