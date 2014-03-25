@@ -1,0 +1,14 @@
+{
+  "node": true,
+  "es5": false,
+  "globals": {
+    "expect": false,
+    "sinon": false,
+    "describe": false,
+    "it": false,
+    "beforeEach": false,
+    "afterEach": false,
+    "before": false,
+    "after": false
+  }
+}
