@@ -1,0 +1,28 @@
+{
+  "name": "consumr-rest",
+  "version": "0.0.0",
+  "description": "Consumr plugin for building REST API wrappers",
+  "main": "src/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/valet-io/consumr-rest"
+  },
+  "keywords": [
+    "REST",
+    "api",
+    "wrapper",
+    "consumr"
+  ],
+  "author": "Ben Drucker <bvdrucker@gmail.com> (http://www.bendrucker.me/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/valet-io/consumr-rest/issues"
+  },
+  "homepage": "https://github.com/valet-io/consumr-rest"
+}
