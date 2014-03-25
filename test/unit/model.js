@@ -37,43 +37,43 @@ describe('Model', function () {
 
   
 
-  // describe('REST Methods', function () {
+  describe('REST Methods', function () {
 
-  //   beforeEach(function () {
-  //     model.id = 0;
-  //   });
+    beforeEach(function () {
+      model.id = 0;
+    });
 
-  //   var send;
-  //   beforeEach(function () {
-  //     send = sinon.stub(Request.prototype, 'send').resolves({
-  //       foo: 'bar'
-  //     });
-  //   });
+    var send;
+    beforeEach(function () {
+      send = sinon.stub(Request.prototype, 'send').resolves({
+        foo: 'bar'
+      });
+    });
 
-  //   afterEach(function () {
-  //     send.restore();
-  //   });
+    afterEach(function () {
+      send.restore();
+    });
 
-  //   describe('#fetch', function () {
+    describe('#fetch', function () {
 
-  //     it('cannot be fetched when isNew', function () {
-  //       model.id = undefined;
-  //       return expect(model.fetch()).to.be.rejectedWith(/Cannot fetch/);
-  //     });
+      it('cannot be fetched when isNew', function () {
+        sinon.stub(model, 'isNew').returns(true);
+        return expect(model.fetch()).to.be.rejectedWith(/^Action not allowed/);
+      });
 
-  //     it('GETs the model url', function  () {
-  //       return model.fetch().finally(function () {
-  //         expect(send).to.have.been.calledOn(sinon.match.has('url', model.url()));
-  //       });
-  //     });
+      it('GETs the model url', function  () {
+        return model.fetch().finally(function () {
+          expect(send).to.have.been.calledOn(sinon.match.has('url', model.url()));
+        });
+      });
 
-  //     it('populates the model with the response body', function () {
-  //       return model.fetch().then(function (model) {
-  //         expect(model).to.have.property('foo', 'bar');
-  //       });
-  //     });
+      it('populates the model with the response body', function () {
+        return model.fetch().then(function (model) {
+          expect(model).to.have.property('foo', 'bar');
+        });
+      });
 
-  //   });
+    });
 
   //   describe('#save', function () {
 
@@ -134,6 +134,6 @@ describe('Model', function () {
 
   //   });
 
-  // });
+  });
   
 });
