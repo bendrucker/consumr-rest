@@ -16,3 +16,14 @@ gulp.task('lint', function () {
     .pipe(plugins.jshint.reporter('jshint-stylish'))
     .pipe(plugins.jshint.reporter('fail'));
 });
+
+gulp.task('test', ['lint'], function (done) {
+  gulp.src(files.src)
+    .pipe(plugins.istanbul())
+    .on('end', function () {
+      gulp.src(files.test)
+        .pipe(plugins.mocha())
+        .pipe(plugins.istanbul.writeReports())
+        .on('end', done);
+    });
+});
