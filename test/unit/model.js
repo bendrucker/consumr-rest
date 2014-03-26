@@ -114,8 +114,10 @@ describe('Model', function () {
       it('DELETEs the model url', function  () {
         var url = model.url();
         return model.destroy().finally(function () {
-          expect(send).to.have.been.calledOn(sinon.match.has('url', sinon.match(/\/0$/)));
-          expect(send).to.have.been.calledOn(sinon.match.has('method', 'DELETE'));
+          expect(send).to.have.been.calledOn(
+            sinon.match.has('url', sinon.match(/\/0$/))
+            .and(sinon.match.has('method', 'DELETE'))
+          );
         });
       });
 
