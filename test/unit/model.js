@@ -11,36 +11,34 @@ describe('Model', function () {
     model = new RESTModel();
   });
 
-  describe('.rest', function () {
+  describe('#url', function () {
 
-    describe('#url', function () {
+    beforeEach(function () {
+      model.base = 'http://base';
+      model.path = 'model';
+    });
 
-      beforeEach(function () {
-        model.base = 'http://base';
-        model.path = 'model';
-      });
+    it('is the collection endpoint for new models', function () {
+      sinon.stub(model, 'isNew').returns(true);
+      expect(model.url()).to.equal('http://base/model');
+    });
 
-      it('is the collection endpoint for new models', function () {
-        sinon.stub(model, 'isNew').returns(true);
-        expect(model.url()).to.equal('http://base/model');
-      });
-
-      it('is the model endpoint for persisted models', function () {
-        sinon.stub(model, 'isNew').returns(false);
-        model.id = 0;
-        expect(model.url()).to.equal('http://base/model/0');
-      });
-
+    it('is the model endpoint for persisted models', function () {
+      sinon.stub(model, 'isNew').returns(false);
+      model.id = 0;
+      expect(model.url()).to.equal('http://base/model/0');
     });
 
   });
-
-  
 
   describe('REST Methods', function () {
 
     beforeEach(function () {
       model.id = 0;
+    });
+
+    beforeEach(function () {
+      sinon.spy(model, 'set');
     });
 
     var send;
@@ -68,49 +66,43 @@ describe('Model', function () {
       });
 
       it('populates the model with the response body', function () {
-        return model.fetch().then(function (model) {
-          expect(model).to.have.property('foo', 'bar');
+        return model.fetch().then(function () {
+          expect(model.set).to.have.been.calledWithMatch({foo: 'bar'});
         });
       });
 
     });
 
-  //   describe('#save', function () {
+    describe('#save', function () {
 
-  //     it('runs a POST when isNew', function () {
-  //       model.id = undefined;
-  //       return model.save().finally(function () {
-  //         expect(send).to.have.been.calledOn(sinon.match.has('method', 'POST'));
-  //       });
-  //     });
+      it('runs a POST when isNew', function () {
+        sinon.stub(model, 'isNew').returns(true);
+        return model.save().finally(function () {
+          expect(send).to.have.been.calledOn(sinon.match.has('method', 'POST'));
+        });
+      });
 
-  //     it('runs a PUT when !isNew', function () {
-  //       return model.save().finally(function () {
-  //         expect(send).to.have.been.calledOn(sinon.match.has('method', 'PUT'));
-  //       });
-  //     });
+      it('runs a PUT when !isNew', function () {
+        return model.save().finally(function () {
+          expect(send).to.have.been.calledOn(sinon.match.has('method', 'PUT'));
+        });
+      });
 
-  //     it('sends the model as the request data', function () {
-  //       return model.save().finally(function () {
-  //         expect(send).to.have.been.calledOn(sinon.match.has('data', sinon.match.has('id')));
-  //       });
-  //     });
+      it('sends the model JSON as the request data', function () {
+        sinon.stub(model, 'toJSON').returns({});
+        return model.save().finally(function () {
+          expect(model.toJSON).to.have.been.calledWithMatch({shallow: true});
+          expect(send).to.have.been.calledOn(sinon.match.has('data', model.toJSON.firstCall.returnValue));
+        });
+      });
 
-  //     it('strips internal properties before sending', function () {
-  //       return model
-  //         .on('preRequest', function (request) {
-  //           expect(request.data).to.not.have.property('_events');
-  //         })
-  //         .save();
-  //     });
+      it('populates the model with the response body', function () {
+        return model.save().finally(function () {
+          expect(model.set).to.have.been.calledWithMatch({foo: 'bar'});
+        });
+      });
 
-  //     it('populates the model with the response body', function () {
-  //       return model.save().finally(function () {
-  //         expect(model).to.have.property('foo', 'bar');
-  //       });
-  //     });
-
-  //   });
+    });
 
   //   describe('#destroy', function () {
 
