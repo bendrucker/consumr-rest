@@ -17,6 +17,9 @@ module.exports = function (Collection) {
     return Promise
       .bind(this)
       .then(function () {
+        this.emitThen('preFetch', this);
+      })
+      .then(function () {
         return this.model.prototype.url() + internals.querystring.call(this);
       })
       .then(function (url) {
@@ -27,7 +30,10 @@ module.exports = function (Collection) {
       })
       .tap(utils.eavesdrop)
       .call('send')
-      .then(this.merge);
+      .then(this.merge)
+      .tap(function () {
+        this.emitThen('postFetch', this);
+      });
   };
 
   return Collection;

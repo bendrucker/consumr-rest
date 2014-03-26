@@ -31,7 +31,18 @@ describe('Collection', function () {
     collection.model = Model;
   });
 
+  beforeEach(function () {
+    sinon.spy(collection, 'emitThen');
+    sinon.spy(collection, 'merge');
+  });
+
   describe('#fetch', function () {
+
+    it('emits a preFetch event', function () {
+      return collection.fetch().finally(function () {
+        expect(collection.emitThen).to.have.been.calledWith('preFetch', collection);
+      });
+    });
 
     it('fetches the base URL if no attributes are defined', function () {
       return collection.fetch().finally(function () {
@@ -59,6 +70,20 @@ describe('Collection', function () {
           errorProperty: 'error',
           dataProperty: 'data'
         })));
+      });
+    });
+
+    it('merges the response body', function () {
+      return collection.fetch().finally(function () {
+        expect(collection.merge).to.have.been.calledWithMatch([]);
+      });
+    });
+
+    it('emits a postFetch event', function () {
+      return collection.fetch().finally(function () {
+        expect(collection.emitThen)
+          .to.have.been.calledWith('preFetch', collection)
+          .and.to.have.been.calledAfter(collection.merge);
       });
     });
 
