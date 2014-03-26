@@ -1,8 +1,8 @@
 var Model = function () {};
 
-Model.prototype.isNew = function () {};
-Model.prototype.emitThen = function () {};
-Model.prototype.toJSON = function () {};
-Model.prototype.set = function () {};
+['isNew','emitThen','toJSON','set','reset']
+  .forEach(function (method) {
+    Model.prototype[method] = function () {};
+  });
 
 module.exports = Model;

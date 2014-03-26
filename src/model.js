@@ -55,7 +55,7 @@ module.exports = function (Model) {
   };
 
   Model.prototype.destroy = Promise.method(function () {
-    internals.disallowNew.call(this, 'destroy');
+    internals.disallowNew.call(this);
     return Promise
       .bind(this)
       .then(function () {

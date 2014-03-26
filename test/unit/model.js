@@ -104,27 +104,29 @@ describe('Model', function () {
 
     });
 
-  //   describe('#destroy', function () {
+    describe('#destroy', function () {
 
-  //     it('cannot be destroyed when isNew', function () {
-  //       model.id = undefined;
-  //       return expect(model.destroy()).to.be.rejectedWith(/Cannot destroy/);
-  //     });
+      it('cannot be destroyed when isNew', function () {
+        sinon.stub(model, 'isNew').returns(true);
+        return expect(model.destroy()).to.be.rejectedWith(/Action not allowed/);
+      });
 
-  //     it('DELETEs the model url', function  () {
-  //       var url = model.url();
-  //       return model.destroy().finally(function () {
-  //         expect(send).to.have.been.calledOn(sinon.match.has('url', sinon.match(/\/0$/)));
-  //       });
-  //     });
+      it('DELETEs the model url', function  () {
+        var url = model.url();
+        return model.destroy().finally(function () {
+          expect(send).to.have.been.calledOn(sinon.match.has('url', sinon.match(/\/0$/)));
+          expect(send).to.have.been.calledOn(sinon.match.has('method', 'DELETE'));
+        });
+      });
 
-  //     it('resets the model', function  () {
-  //       return model.destroy().finally(function () {
-  //         expect(model).to.not.have.property('id');
-  //       });
-  //     });
+      it('resets the model', function  () {
+        sinon.spy(model, 'reset');
+        return model.destroy().finally(function () {
+          expect(model.reset).to.have.been.called;
+        });
+      });
 
-  //   });
+    });
 
   });
   
