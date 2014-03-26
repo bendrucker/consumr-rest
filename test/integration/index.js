@@ -1,23 +1,33 @@
 'use strict';
 
-var ModelBase = require('consumr').Model;
-var RESTModel = require('../../src/model')(ModelBase);
-var nock      = require('nock');
+var Consumr     = require('consumr');
+var ConsumrREST = require('../../src');
+var nock        = require('nock');
 
 describe('Integration', function () {
+
+  Consumr.use(ConsumrREST);
 
   var test = {};
 
   beforeEach(function () {
     test.Model = function (attributes) {
-      ModelBase.call(this, attributes);
+      Consumr.Model.call(this, attributes);
     };
-    test.Model.prototype = Object.create(ModelBase.prototype);
+    test.Model.prototype = Object.create(Consumr.Model.prototype);
   });
 
   beforeEach(function () {
     test.Model.prototype.base = 'http://testendpoint.api';
     test.Model.prototype.path = 'users';
+  });
+
+  beforeEach(function () {
+    test.Collection = function (attributes) {
+      Consumr.Collection.call(this, attributes);
+    };
+    test.Collection.prototype = Object.create(Consumr.Collection.prototype);
+    test.Collection.prototype.model = test.Model;
   });
 
   beforeEach(function () {
@@ -34,6 +44,7 @@ describe('Integration', function () {
   });
 
   require('./model')(test);
+  require('./collection')(test);
 
   // describe('Collection', function () {
 
