@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+- '0.11'
+- '0.10'
+deploy:
+  provider: npm
+  email: bvdrucker@gmail.com
+  api_key:
+    secure: apkbAGIHsOI2x+JgK1P8EexB6QlvTFvTmtcunwq2V6xgsrPMXkfl4pTwypRhuMcs8QYxBXdYybwOnwCK2RQTD0obZ7Pd2Nba7X9eKd8exAeAj/24NmDhajgXKMTIbNdkd91x4T5Q0aK0clLyhk7cWmHG/1ZYUW4XCdCbmGe/ZBo=
+  on:
+    tags: true
+    repo: valet-io/consumr-rest
