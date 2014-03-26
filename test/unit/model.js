@@ -39,6 +39,7 @@ describe('Model', function () {
 
     beforeEach(function () {
       sinon.spy(model, 'set');
+      sinon.spy(model, 'emitThen');
     });
 
     var send;
@@ -59,6 +60,12 @@ describe('Model', function () {
         return expect(model.fetch()).to.be.rejectedWith(/^Action not allowed/);
       });
 
+      it('fires a preFetch event', function () {
+        return model.fetch().finally(function () {
+          expect(model.emitThen).to.have.been.calledWith('preFetch', model);
+        });
+      });
+
       it('GETs the model url', function  () {
         return model.fetch().finally(function () {
           expect(send).to.have.been.calledOn(sinon.match.has('url', model.url()));
@@ -68,6 +75,14 @@ describe('Model', function () {
       it('populates the model with the response body', function () {
         return model.fetch().then(function () {
           expect(model.set).to.have.been.calledWithMatch({foo: 'bar'});
+        });
+      });
+
+      it('fires a postFetch event', function () {
+        return model.fetch().finally(function () {
+          expect(model.emitThen)
+            .to.have.been.calledWith('postFetch', model)
+            .and.to.have.been.calledAfter(model.set);
         });
       });
 
@@ -88,6 +103,12 @@ describe('Model', function () {
         });
       });
 
+      it('fires a preSave event', function () {
+        return model.save().finally(function () {
+          expect(model.emitThen).to.have.been.calledWith('preSave', model);
+        });
+      });
+
       it('sends the model JSON as the request data', function () {
         sinon.stub(model, 'toJSON').returns({});
         return model.save().finally(function () {
@@ -102,17 +123,34 @@ describe('Model', function () {
         });
       });
 
+      it('fires a postSave event', function () {
+        return model.save().finally(function () {
+          expect(model.emitThen)
+            .to.have.been.calledWith('postSave', model)
+            .and.to.have.been.calledAfter(model.set);
+        });
+      });
+
     });
 
     describe('#destroy', function () {
+
+      beforeEach(function () {
+        sinon.spy(model, 'reset');
+      });
 
       it('cannot be destroyed when isNew', function () {
         sinon.stub(model, 'isNew').returns(true);
         return expect(model.destroy()).to.be.rejectedWith(/Action not allowed/);
       });
 
+      it('fires a preDestroy event', function () {
+        return model.destroy().finally(function () {
+          expect(model.emitThen).to.have.been.calledWith('preDestroy', model);
+        });
+      });
+
       it('DELETEs the model url', function  () {
-        var url = model.url();
         return model.destroy().finally(function () {
           expect(send).to.have.been.calledOn(
             sinon.match.has('url', sinon.match(/\/0$/))
@@ -122,9 +160,16 @@ describe('Model', function () {
       });
 
       it('resets the model', function  () {
-        sinon.spy(model, 'reset');
         return model.destroy().finally(function () {
           expect(model.reset).to.have.been.called;
+        });
+      });
+
+      it('fires a postDestroy event', function () {
+        return model.destroy().finally(function () {
+          expect(model.emitThen)
+            .to.have.been.calledWith('postDestroy', model)
+            .and.to.have.been.calledAfter(model.reset);
         });
       });
 
