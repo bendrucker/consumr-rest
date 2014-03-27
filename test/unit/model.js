@@ -31,6 +31,38 @@ describe('Model', function () {
 
   });
 
+  var send;
+  beforeEach(function () {
+    send = sinon.stub(Request.prototype, 'send').resolves({
+      foo: 'bar'
+    });
+  });
+
+  afterEach(function () {
+    send.restore();
+  });
+
+  describe('#request', function () {
+
+    it('sends a request with the supplied params', function () {
+      return model.request().finally(function () {
+        expect(send).to.have.been.called;
+      });
+    });
+
+    it('supplies the data and error properties from the model', function () {
+      model.dataProperty = 'd';
+      model.errorProperty = 'e';
+      return model.request().finally(function () {
+        expect(send).to.have.been.calledOn(
+          sinon.match.has('options', sinon.match.has('dataProperty', 'd')
+          .and(sinon.match.has('errorProperty', 'e')))
+        );
+      });
+    });
+
+  });
+
   describe('REST Methods', function () {
 
     beforeEach(function () {
@@ -42,15 +74,8 @@ describe('Model', function () {
       sinon.spy(model, 'emitThen');
     });
 
-    var send;
     beforeEach(function () {
-      send = sinon.stub(Request.prototype, 'send').resolves({
-        foo: 'bar'
-      });
-    });
-
-    afterEach(function () {
-      send.restore();
+      sinon.spy(model, 'request');
     });
 
     describe('#fetch', function () {
@@ -68,7 +93,7 @@ describe('Model', function () {
 
       it('GETs the model url', function  () {
         return model.fetch().finally(function () {
-          expect(send).to.have.been.calledOn(sinon.match.has('url', model.url()));
+          expect(model.request).to.have.been.calledWith('GET', model.url());
         });
       });
 
@@ -93,13 +118,13 @@ describe('Model', function () {
       it('runs a POST when isNew', function () {
         sinon.stub(model, 'isNew').returns(true);
         return model.save().finally(function () {
-          expect(send).to.have.been.calledOn(sinon.match.has('method', 'POST'));
+          expect(model.request).to.have.been.calledWith('POST', model.url());
         });
       });
 
       it('runs a PUT when !isNew', function () {
         return model.save().finally(function () {
-          expect(send).to.have.been.calledOn(sinon.match.has('method', 'PUT'));
+          expect(model.request).to.have.been.calledWith('PUT', model.url());
         });
       });
 
@@ -113,7 +138,7 @@ describe('Model', function () {
         sinon.stub(model, 'toJSON').returns({});
         return model.save().finally(function () {
           expect(model.toJSON).to.have.been.calledWithMatch({shallow: true});
-          expect(send).to.have.been.calledOn(sinon.match.has('data', model.toJSON.firstCall.returnValue));
+          expect(model.request).to.have.been.calledWith(sinon.match.any, sinon.match.any, model.toJSON.firstCall.returnValue);
         });
       });
 
@@ -152,10 +177,7 @@ describe('Model', function () {
 
       it('DELETEs the model url', function  () {
         return model.destroy().finally(function () {
-          expect(send).to.have.been.calledOn(
-            sinon.match.has('url', sinon.match(/\/0$/))
-            .and(sinon.match.has('method', 'DELETE'))
-          );
+          expect(model.request).to.have.been.calledWith('DELETE', model.url());
         });
       });
 

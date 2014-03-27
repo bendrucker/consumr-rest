@@ -14,10 +14,24 @@ internals.save = function () {
   return this.isNew() ? 'POST' : 'PUT';
 };
 
+internals.options = function (options) {
+  options.dataProperty = this.dataProperty;
+  options.errorProperty = this.errorProperty;
+  return options;
+};
+
 module.exports = function (Model) {
 
   Model.prototype.url = function () {
     return this.base + '/' + this.path + (this.isNew() ? '' : '/' + this.id);
+  };
+
+  Model.prototype.request = function (method, url, data, options) {
+    return Promise
+      .bind(this)
+      .return(new Request(method, url, data, internals.options.call(this, options || {})))
+      .tap(utils.eavesdrop)
+      .call('send');
   };
 
   Model.prototype.fetch = Promise.method(function () {
@@ -27,9 +41,9 @@ module.exports = function (Model) {
       .then(function () {
         return this.emitThen('preFetch', this);
       })
-      .return(new Request('GET', this.url()))
-      .tap(utils.eavesdrop)
-      .call('send')
+      .then(function () {
+        return this.request('GET', this.url());
+      })
       .then(this.set)
       .tap(function () {
         return this.emitThen('postFetch', this);
@@ -44,10 +58,8 @@ module.exports = function (Model) {
       })
       .then(internals.save)
       .then(function (method) {
-        return new Request(method, this.url(), this.toJSON({shallow: true}));
+        return this.request(method, this.url(), this.toJSON({shallow: true}));
       })
-      .tap(utils.eavesdrop)
-      .call('send')
       .then(this.set)
       .tap(function () {
         return this.emitThen('postSave', this);
@@ -61,9 +73,9 @@ module.exports = function (Model) {
       .then(function () {
         return this.emitThen('preDestroy', this);
       })
-      .return(new Request('DELETE', this.url()))
-      .tap(utils.eavesdrop)
-      .call('send')
+      .then(function () {
+        return this.request('DELETE', this.url());
+      })
       .then(this.reset)
       .tap(function () {
         this.emitThen('postDestroy', this);
