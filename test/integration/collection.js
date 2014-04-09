@@ -8,7 +8,7 @@ module.exports = function (test) {
 
     var users, user;
     beforeEach(function () {
-      users = new test.Collection();
+      users = new test.Collection(test.Model);
       user = new test.Model({id: 0});
       users.push(user);
     });

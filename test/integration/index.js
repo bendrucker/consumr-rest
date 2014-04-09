@@ -11,23 +11,14 @@ describe('Integration', function () {
   var test = {};
 
   beforeEach(function () {
-    test.Model = function (attributes) {
-      Consumr.Model.call(this, attributes);
-    };
-    test.Model.prototype = Object.create(Consumr.Model.prototype);
+    test.Model = Consumr.Model.extend({
+      base: 'http://testendpoint.api',
+      path: 'users'
+    });
   });
 
   beforeEach(function () {
-    test.Model.prototype.base = 'http://testendpoint.api';
-    test.Model.prototype.path = 'users';
-  });
-
-  beforeEach(function () {
-    test.Collection = function (attributes) {
-      Consumr.Collection.call(this, attributes);
-    };
-    test.Collection.prototype = Object.create(Consumr.Collection.prototype);
-    test.Collection.prototype.model = test.Model;
+    test.Collection = Consumr.Collection;
   });
 
   beforeEach(function () {
