@@ -33,6 +33,37 @@ module.exports = function (test) {
           });
       });
 
+      it('can fetch with related data', function () {
+        user.relations = {
+          invited_by: function () {
+            return this.belongsTo(test.Model, 'invited_by_id');
+          }
+        };
+        test.api
+          .get('/users/0')
+          .reply(200, {
+            id: 0,
+            name: 'Ben',
+            invited_by_id: 1,
+            invited_by: {
+              name: 'Jordan'
+            }
+          });
+        return user
+          .fetch({withRelated: 'invited_by'})
+          .then(function (user) {
+            expect(user).to.have.property('invited_by')
+              .that.is.an.instanceof(test.Model);
+            return user.invited_by;
+          })
+          .then(function (invited_by) {
+            expect(invited_by).to.contain({
+              id: 1,
+              name: 'Jordan'
+            });
+          });
+      });
+
       it('triggers lifecycle events', function () {
         mockFetch();
         return utils.verifyRequestEvents(user, 'fetch');
