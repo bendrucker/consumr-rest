@@ -64,6 +64,36 @@ module.exports = function (test) {
           });
       });
 
+      it('can fetch with collections of related data', function () {
+        user.relations = {
+          friends: function () {
+            return this.hasMany(test.Model, 'friends');
+          }
+        };
+        test.api
+          .get('/users/0')
+          .reply(200, {
+            id: 0,
+            name: 'Ben',
+            friends: [{
+              name: 'Jordan'
+            }]
+          });
+        return user
+          .fetch({withRelated: 'friends'})
+          .then(function (user) {
+            expect(user).to.have.property('friends')
+              .that.is.an.instanceOf(test.Collection);
+            return user.friends;
+          })
+          .then(function (friends) {
+            expect(friends).to.have.length(1)
+              .and.property(0)
+              .that.is.an.instanceOf(test.Model)
+              .with.property('name', 'Jordan');
+          });
+      });
+
       it('triggers lifecycle events', function () {
         mockFetch();
         return utils.verifyRequestEvents(user, 'fetch');
