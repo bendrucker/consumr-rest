@@ -13,11 +13,12 @@ internals.querystring = function () {
 
 module.exports = function (Collection) {
 
-  Collection.prototype.fetch = function () {
+  Collection.prototype.fetch = function (options) {
+    options = options || {};
     return Promise
       .bind(this)
       .then(function () {
-        this.emitThen('preFetch', this);
+        this.emitThen('preFetch', this, options);
       })
       .then(function () {
         return this.model.prototype.url() + internals.querystring.call(this);
@@ -30,9 +31,11 @@ module.exports = function (Collection) {
       })
       .tap(utils.eavesdrop)
       .call('send')
-      .then(this.merge)
+      .then(function (response) {
+        return this.merge(response, options);
+      })
       .tap(function () {
-        this.emitThen('postFetch', this);
+        this.emitThen('postFetch', this, options);
       });
   };
 

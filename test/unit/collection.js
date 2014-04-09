@@ -31,6 +31,11 @@ describe('Collection', function () {
     collection.model = Model;
   });
 
+  var options;
+  beforeEach(function () {
+    options = {};
+  });
+
   beforeEach(function () {
     sinon.spy(collection, 'emitThen');
     sinon.spy(collection, 'merge');
@@ -39,8 +44,8 @@ describe('Collection', function () {
   describe('#fetch', function () {
 
     it('emits a preFetch event', function () {
-      return collection.fetch().finally(function () {
-        expect(collection.emitThen).to.have.been.calledWith('preFetch', collection);
+      return collection.fetch(options).finally(function () {
+        expect(collection.emitThen).to.have.been.calledWith('preFetch', collection, options);
       });
     });
 
@@ -75,14 +80,14 @@ describe('Collection', function () {
 
     it('merges the response body', function () {
       return collection.fetch().finally(function () {
-        expect(collection.merge).to.have.been.calledWithMatch([]);
+        expect(collection.merge).to.have.been.calledWithMatch([], options);
       });
     });
 
     it('emits a postFetch event', function () {
-      return collection.fetch().finally(function () {
+      return collection.fetch(options).finally(function () {
         expect(collection.emitThen)
-          .to.have.been.calledWith('preFetch', collection)
+          .to.have.been.calledWith('preFetch', collection, options)
           .and.to.have.been.calledAfter(collection.merge);
       });
     });
