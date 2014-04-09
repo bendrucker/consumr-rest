@@ -65,8 +65,10 @@ describe('Model', function () {
 
   describe('REST Methods', function () {
 
+    var options;
     beforeEach(function () {
       model.id = 0;
+      options = {};
     });
 
     beforeEach(function () {
@@ -86,27 +88,27 @@ describe('Model', function () {
       });
 
       it('fires a preFetch event', function () {
-        return model.fetch().finally(function () {
-          expect(model.emitThen).to.have.been.calledWith('preFetch', model);
+        return model.fetch(options).finally(function () {
+          expect(model.emitThen).to.have.been.calledWith('preFetch', model, options);
         });
       });
 
       it('GETs the model url', function  () {
-        return model.fetch().finally(function () {
-          expect(model.request).to.have.been.calledWith('GET', model.url());
+        return model.fetch(options).finally(function () {
+          expect(model.request).to.have.been.calledWith('GET', model.url(), null, options);
         });
       });
 
       it('populates the model with the response body', function () {
-        return model.fetch().then(function () {
-          expect(model.set).to.have.been.calledWithMatch({foo: 'bar'});
+        return model.fetch(options).then(function () {
+          expect(model.set).to.have.been.calledWithMatch({foo: 'bar'}, options);
         });
       });
 
       it('fires a postFetch event', function () {
-        return model.fetch().finally(function () {
+        return model.fetch(options).finally(function () {
           expect(model.emitThen)
-            .to.have.been.calledWith('postFetch', model)
+            .to.have.been.calledWith('postFetch', model, options)
             .and.to.have.been.calledAfter(model.set);
         });
       });
@@ -117,8 +119,8 @@ describe('Model', function () {
 
       it('runs a POST when isNew', function () {
         sinon.stub(model, 'isNew').returns(true);
-        return model.save().finally(function () {
-          expect(model.request).to.have.been.calledWith('POST', model.url());
+        return model.save(options).finally(function () {
+          expect(model.request).to.have.been.calledWith('POST', model.url(), sinon.match.any, options);
         });
       });
 
@@ -129,29 +131,34 @@ describe('Model', function () {
       });
 
       it('fires a preSave event', function () {
-        return model.save().finally(function () {
-          expect(model.emitThen).to.have.been.calledWith('preSave', model);
+        return model.save(options).finally(function () {
+          expect(model.emitThen).to.have.been.calledWith('preSave', model, options);
         });
       });
 
       it('sends the model JSON as the request data', function () {
         sinon.stub(model, 'toJSON').returns({});
-        return model.save().finally(function () {
-          expect(model.toJSON).to.have.been.calledWithMatch({shallow: true});
-          expect(model.request).to.have.been.calledWith(sinon.match.any, sinon.match.any, model.toJSON.firstCall.returnValue);
+        return model.save(options).finally(function () {
+          expect(model.toJSON).to.have.been.called;
+          expect(model.request).to.have.been.calledWith(
+            sinon.match.any,
+            sinon.match.any,
+            model.toJSON.firstCall.returnValue,
+            options
+          );
         });
       });
 
       it('populates the model with the response body', function () {
-        return model.save().finally(function () {
-          expect(model.set).to.have.been.calledWithMatch({foo: 'bar'});
+        return model.save(options).finally(function () {
+          expect(model.set).to.have.been.calledWithMatch({foo: 'bar'}, {});
         });
       });
 
       it('fires a postSave event', function () {
-        return model.save().finally(function () {
+        return model.save(options).finally(function () {
           expect(model.emitThen)
-            .to.have.been.calledWith('postSave', model)
+            .to.have.been.calledWith('postSave', model, options)
             .and.to.have.been.calledAfter(model.set);
         });
       });
@@ -170,14 +177,14 @@ describe('Model', function () {
       });
 
       it('fires a preDestroy event', function () {
-        return model.destroy().finally(function () {
-          expect(model.emitThen).to.have.been.calledWith('preDestroy', model);
+        return model.destroy(options).finally(function () {
+          expect(model.emitThen).to.have.been.calledWith('preDestroy', model, options);
         });
       });
 
       it('DELETEs the model url', function  () {
-        return model.destroy().finally(function () {
-          expect(model.request).to.have.been.calledWith('DELETE', model.url());
+        return model.destroy(options).finally(function () {
+          expect(model.request).to.have.been.calledWith('DELETE', model.url(), null, options);
         });
       });
 
@@ -188,9 +195,9 @@ describe('Model', function () {
       });
 
       it('fires a postDestroy event', function () {
-        return model.destroy().finally(function () {
+        return model.destroy(options).finally(function () {
           expect(model.emitThen)
-            .to.have.been.calledWith('postDestroy', model)
+            .to.have.been.calledWith('postDestroy', model, options)
             .and.to.have.been.calledAfter(model.reset);
         });
       });
