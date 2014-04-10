@@ -13,7 +13,8 @@
     "bluebird": "~1.1.x",
     "eavesdrop": "0.1.x",
     "request2": "0.1.x",
-    "nock": "~0.27.2"
+    "nock": "~0.27.2",
+    "lodash": "2.x"
   },
   "devDependencies": {
     "test-setup": "valet-io/test-setup",

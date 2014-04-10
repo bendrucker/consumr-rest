@@ -40,7 +40,7 @@ module.exports = function (test) {
           }
         };
         test.api
-          .get('/users/0')
+          .get('/users/0?expand=invited_by')
           .reply(200, {
             id: 0,
             name: 'Ben',
@@ -71,7 +71,7 @@ module.exports = function (test) {
           }
         };
         test.api
-          .get('/users/0')
+          .get('/users/0?expand=friends')
           .reply(200, {
             id: 0,
             name: 'Ben',

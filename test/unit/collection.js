@@ -61,8 +61,15 @@ describe('Collection', function () {
         baz: 'qux'
       };
       return collection.fetch().finally(function () {
-        expect(send).to.have.been.calledOn(sinon.match.has(
-          'url', 'http://url/?foo=bar&baz=qux'));
+        expect(send.firstCall.thisValue).to.have.deep.property('options.query')
+          .and.contain(collection.attributes);
+      });
+    });
+
+    it('adds related properties to the expand query', function () {
+      return collection.fetch({withRelated: ['foo', 'bar']}).finally(function () {
+        expect(send.firstCall.thisValue).to.have.deep.property('options.query.expand')
+          .and.include('foo', 'bar');
       });
     });
 

@@ -2,13 +2,17 @@
 
 var Promise     = require('bluebird');
 var Request     = require('request2');
-var querystring = require('querystring');
+var _           = require('lodash');
 var utils       = require('./utils');
 
 var internals = {};
 
-internals.querystring = function () {
-  return Object.keys(this.attributes).length ? '?' + querystring.stringify(this.attributes) : '';
+internals.query = function (collection, options) {
+  var query = _.clone(collection.attributes);
+  if (options.expand !== false && options.withRelated) {
+    query.expand = options.withRelated;
+  }
+  return query;
 };
 
 module.exports = function (Collection) {
@@ -20,13 +24,11 @@ module.exports = function (Collection) {
       .then(function () {
         this.emitThen('preFetch', this, options);
       })
-      .then(function () {
-        return this.model.prototype.url() + internals.querystring.call(this);
-      })
       .then(function (url) {
-        return new Request('GET', url, null, {
+        return new Request('GET', this.model.prototype.url(), null, {
           errorProperty: this.model.prototype.errorProperty,
-          dataProperty: this.model.prototype.dataProperty
+          dataProperty: this.model.prototype.dataProperty,
+          query: internals.query(this, options)
         });
       })
       .tap(utils.eavesdrop)
