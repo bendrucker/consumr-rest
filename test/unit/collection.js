@@ -26,7 +26,7 @@ describe('Collection', function () {
       prototype: {}
     };
     Model.prototype.url = function () {
-      return 'http://url';
+      return 'http://url/';
     };
     collection.model = Model;
   });
@@ -51,7 +51,7 @@ describe('Collection', function () {
 
     it('fetches the base URL if no attributes are defined', function () {
       return collection.fetch().finally(function () {
-        expect(send).to.have.been.calledOn(sinon.match.has('url', 'http://url'));
+        expect(send).to.have.been.calledOn(sinon.match.has('url', 'http://url/'));
       });
     });
 
@@ -62,7 +62,7 @@ describe('Collection', function () {
       };
       return collection.fetch().finally(function () {
         expect(send).to.have.been.calledOn(sinon.match.has(
-          'url', 'http://url?foo=bar&baz=qux'));
+          'url', 'http://url/?foo=bar&baz=qux'));
       });
     });
 

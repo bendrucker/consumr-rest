@@ -45,7 +45,7 @@ describe('Model', function () {
   describe('#request', function () {
 
     it('sends a request with the supplied params', function () {
-      return model.request().finally(function () {
+      return model.request(null, '').finally(function () {
         expect(send).to.have.been.called;
       });
     });
@@ -53,7 +53,7 @@ describe('Model', function () {
     it('supplies the data and error properties from the model', function () {
       model.dataProperty = 'd';
       model.errorProperty = 'e';
-      return model.request().finally(function () {
+      return model.request(null, '').finally(function () {
         expect(send).to.have.been.calledOn(
           sinon.match.has('options', sinon.match.has('dataProperty', 'd')
           .and(sinon.match.has('errorProperty', 'e')))

@@ -12,7 +12,7 @@
   "dependencies": {
     "bluebird": "~1.1.x",
     "eavesdrop": "0.1.x",
-    "request2": "0.0.x",
+    "request2": "0.1.x",
     "nock": "~0.27.2"
   },
   "devDependencies": {
