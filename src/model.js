@@ -14,9 +14,9 @@ internals.save = function () {
   return this.isNew() ? 'POST' : 'PUT';
 };
 
-internals.options = function (options) {
-  options.dataProperty = this.dataProperty;
-  options.errorProperty = this.errorProperty;
+internals.options = function (model, options) {
+  options.dataProperty = model.dataProperty;
+  options.errorProperty = model.errorProperty;
   return options;
 };
 
@@ -29,7 +29,7 @@ module.exports = function (Model) {
   Model.prototype.request = function (method, url, data, options) {
     return Promise
       .bind(this)
-      .return(new Request(method, url, data, internals.options.call(this, options || {})))
+      .return(new Request(method, url, data, internals.options(model, options || {})))
       .tap(utils.eavesdrop)
       .call('send');
   };
